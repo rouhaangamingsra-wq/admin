@@ -16,6 +16,10 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(MOCK_ADMIN);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    setToken('admin-mock');
+  }, []);
+
   const login = async () => {
     setUser(MOCK_ADMIN);
     return MOCK_ADMIN;
