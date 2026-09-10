@@ -10,62 +10,19 @@ export function useAuth() {
   return ctx;
 }
 
+const MOCK_ADMIN = { uid: 'admin', email: 'admin@example.com', role: 'admin', name: 'Admin' };
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(MOCK_ADMIN);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const load = async () => {
-      const token = getToken();
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const res = await api.get('/auth/me');
-        if (res.user?.role !== 'admin') {
-          setToken(null);
-          setUser(null);
-        } else {
-          setUser(res.user);
-        }
-      } catch {
-        setToken(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
-
-  const login = async (email, password) => {
-    let token;
-    if (!firebaseEnabled) {
-      token = `admin-${email}`;
-    } else {
-      const { signInWithEmailAndPassword } = await import('firebase/auth');
-      const cred = await signInWithEmailAndPassword(fbAuth, email, password);
-      token = await cred.user.getIdToken();
-    }
-    setToken(token);
-    const res = await api.get('/auth/me');
-    if (res.user?.role !== 'admin') {
-      setToken(null);
-      throw new Error('Admin access only.');
-    }
-    setUser(res.user);
-    return res.user;
+  const login = async () => {
+    setUser(MOCK_ADMIN);
+    return MOCK_ADMIN;
   };
 
   const logout = async () => {
-    if (firebaseEnabled && fbAuth) {
-      try {
-        const { signOut } = await import('firebase/auth');
-        await signOut(fbAuth);
-      } catch {}
-    }
-    setToken(null);
-    setUser(null);
+    setUser(MOCK_ADMIN);
   };
 
   const value = useMemo(() => ({ user, loading, login, logout, firebaseEnabled }), [user, loading]);
